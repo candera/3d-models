@@ -12,7 +12,8 @@ cap_inner_height=9.6;
 air_inlet_d=6;
 spout_height=30;
 funnel_height=60;
-stop_ring_height=5;
+funnel_spout_d=15.5;
+nstop_ring_height=5;
 extrusion_width=0.35;
 stop_ring_spacing=extrusion_width/2;
 output_height=90;
@@ -28,25 +29,25 @@ module hollow_cylinder(h,d_inner,d_outer) {
   }
 }
 
-module spout() {
+module funnel_spout() {
   hollow_cylinder(h=spout_height,
-                  d_outer=bottle_inner_d,
-                  d_inner=bottle_inner_d-wall_thickness);
+                  d_outer=funnel_spout_d,
+                  d_inner=funnel_spout_d-wall_thickness);
 }
 
-module funnel() {
+module funnel_cone() {
   difference() {
-    cylinder(h=funnel_height,d1=bottle_inner_d, d2=bottle_inner_d+funnel_height);
+    cylinder(h=funnel_height,d1=funnel_spout_d, d2=funnel_spout_d+funnel_height);
     translate([0,0,-e2]){
-      cylinder(h=funnel_height+e,d1=bottle_inner_d-wall_thickness, d2=bottle_inner_d+funnel_height-wall_thickness);
+      cylinder(h=funnel_height+e,d1=funnel_spout_d-wall_thickness, d2=funnel_spout_d+funnel_height-wall_thickness);
     }
   }
 }
 
-module lip() {
+module funnel_lip() {
   difference() {
     rotate_extrude(angle=360) {
-      translate([(bottle_inner_d+funnel_height-wall_thickness)/2,0,0]) {
+      translate([(funnel_spout_d+funnel_height-wall_thickness)/2,0,0]) {
         circle(wall_thickness);
       }
     }
@@ -56,16 +57,16 @@ module lip() {
   }
 }
 
-module funnel() {
+module funnel_assembly() {
   translate([0,0,spout_height+funnel_height]) {
     rotate([180,0,0]) {
       union() {
-        spout();
+        funnel_spout();
         translate([0,0,spout_height]) {
-          funnel();
+          funnel_cone();
         }
         translate([0,0,spout_height+funnel_height]) {
-          lip();
+          funnel_lip();
         }
       }
     }
@@ -140,10 +141,12 @@ module threaded_cap() {
   }
 }
 
-/* funnel(); */
+air_inlet();
+
+/* funnel_assembly(); */
 
 /* pourspout(); */
 /* translate([bottle_inner_d+2*wall_thickness,0,0]) stop_ring(); */
 /* translate([-(bottle_inner_d+2*wall_thickness),0,0]) cap(); */
 
-threaded_cap();
+// threaded_cap();
