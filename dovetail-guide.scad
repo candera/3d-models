@@ -1,12 +1,25 @@
+// Settings for saw guide itself
+/* ratio = 6; // 6:1 */
+/* angle = atan(1/ratio); */
+/* epsilon = 0.01; */
+/* overall_length = 45; */
+/* overall_width = 45; */
+/* overall_height = 45; */
+/* wall_thickness = 18; */
+/* magnet_diameter = 8.2; */
+/* magnet_thickness = 3.2; */
+
+// Settings for marking gauge
 ratio = 6; // 6:1
 angle = atan(1/ratio);
 epsilon = 0.01;
-overall_length = 45;
-overall_width = 45;
-overall_height = 45;
-wall_thickness = 18;
+overall_length = 30;
+overall_width = 30;
+overall_height = 30;
+wall_thickness = 5;
 magnet_diameter = 8.2;
-magnet_thickness = 3.2;
+magnet_thickness = 0;
+
 
 $fn=48;
 
