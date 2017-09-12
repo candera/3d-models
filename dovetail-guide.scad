@@ -1,3 +1,4 @@
+// &> /dev/null; openscad -o $1 $0; exit # An example of a self-rendering OpenSCAD file
 // Settings for saw guide itself
 /* ratio = 6; // 6:1 */
 /* angle = atan(1/ratio); */
@@ -23,7 +24,11 @@ magnet_thickness = 0;
 
 $fn=48;
 
-// Printing notes: the text did not turn out when facing down.
+/* Printing notes:
+   - The text did not turn out when facing down.
+   - The little marking gauge looks like it needs to print on a raft -
+     got a bit of lifting at the edges.
+*/
 
 module nubbed_cube() {
   union() {
