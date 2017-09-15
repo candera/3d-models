@@ -9,9 +9,9 @@ bolt_diameter = 3;
 epsilon=0.01;
 epsilon2=2*epsilon;
 
-alignment_post_diameter = 2;
-alignment_post_clearance = 0.2;
-alignment_post_length=0.7;
+alignment_post_diameter = 2.7;
+alignment_post_clearance = 0.7;
+alignment_post_length=2;
 
 gap=0.4;
 
@@ -62,7 +62,7 @@ module unit_half() {
         }
       }
       // Cut it in half
-      translate([-100+gap, -50, -1]) {
+      translate([-100+gap/2, -50, -1]) {
         cube(100, 100, 100, center=false);
       }
     }
@@ -88,8 +88,8 @@ module unit() {
 
 color([0.2,0.2,0.2]) {
   union() {
-    //unit_half();
-    unit();
-    mirror([1,0,0]) unit();
+    unit_half();
+    /* unit(); */
+    /* mirror([1,0,0]) unit(); */
   }
 }
