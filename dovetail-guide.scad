@@ -24,6 +24,11 @@ magnet_thickness = 0;
 
 $fn=48;
 
+/* Project notes:
+   - The Lee Valley one is a bit different:
+     http://www.leevalley.com/us/wood/page.aspx?cat=1,42884&p=41718.
+     I like the integral clamp.
+
 /* Printing notes:
    - The text did not turn out when facing down.
    - The little marking gauge looks like it needs to print on a raft -
