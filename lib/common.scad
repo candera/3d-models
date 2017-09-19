@@ -73,3 +73,14 @@ module pillowed_prism(width, length, height, h_radius, v_radius) {
     translate([x2, y2, -height/2+v_radius]) squashed_sphere(h_radius, v_radius);
   }
 }
+
+// Returns a volume that contains all of the points above or below the
+// specified z
+module xy(above, below)
+{
+  d = 10000;
+  if (below == undef)
+    translate([0,0,above+d/2]) cube([d,d,d] ,center=true);
+  else
+    translate([0,0,below-d/2]) cube([d,d,d], center=true);
+}
