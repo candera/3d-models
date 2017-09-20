@@ -378,6 +378,46 @@ module title(s) {
   translate([0, 0, 20]) color([0,0,0]) text(s);
 }
 
+ring_r=4;
+ring_t=1.5;
+ring_h=5;
+
+module eyelet () { // export
+  difference() {
+    scale([3,1,1]) {
+      union() {
+        cylinder(r=ring_r, h=ring_h);
+        translate([-ring_r,0,0]) {
+          cube([ring_r*2, ring_r, ring_h]);
+        }
+      }
+    }
+    translate([0,0,-epsilon]) {
+      scale([1,1,1+epsilon]) {
+        union() {
+          translate([-ring_r,-ring_r/2,0]) {
+            cube([ring_r*2, ring_r, ring_h]);
+          }
+          translate([-ring_r,0,0]) {
+            cylinder(r=ring_r/2, h=ring_h+2*epsilon);
+          }
+          translate([ring_r,0,0]) {
+            cylinder(r=ring_r/2, h=ring_h+2*epsilon);
+          }
+
+        }
+      }
+    }
+          
+                 
+
+    /* translate([0,0,-epsilon]) */
+    /*   cylinder(r=ring_r-ring_t, h=ring_h+2*epsilon); */
+    
+  }
+}
+
+
 union() {
   back1();
   title("back1");
@@ -402,6 +442,12 @@ translate([case_w + 2, case_l + 2, 0]) {
   volume_button();
   title("vol");
 }
+
+translate([case_w * 2 + 4, case_l + 2, 0]) {
+  eyelet();
+  title("eyelet");
+}
+
 /* /\* color([0.4, 0.4, 0.4, 1]) { *\/ */
 /* /\*   translate([wall_thickness, wall_thickness, 0]) { *\/ */
 /* /\*     s5_body();  *\/ */
