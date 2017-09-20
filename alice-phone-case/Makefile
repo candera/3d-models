@@ -15,6 +15,8 @@
 #TARGETS=$(shell sed '/^module [a-z0-9_-]*().*make..\?me.*$$/!d;s/module //;s/().*/.stl/' base.scad)
 TARGETS=$(shell sed '/^module [a-z0-9_-].*().*export/!d;s/module //;s/().*/.generated.stl/' base.scad)
 
+.PHONY: clean
+
 all: ${TARGETS}
 
 # auto-generated .scad files with .deps make make re-build always. keeping the
@@ -29,3 +31,6 @@ include $(wildcard *.deps)
 
 %.stl: %.scad
 	openscad -m make -o $@ -d $@.deps $<
+
+clean:
+	rm *.generated.*
