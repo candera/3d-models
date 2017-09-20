@@ -21,6 +21,13 @@ while [[ "$1" != "" ]]; do
          set -x
          ;;
        *)
+         if [[ $1 =~ ^- ]]
+         then
+             echo "Unrecognized option $1"
+             echo $USAGE
+             exit 1
+         fi
+         
          if [[ -z $OUTPUT ]]
          then
              OUTPUT=$1
@@ -74,7 +81,9 @@ slic3r --load ../config/makergear-m2.ini \
        --load ${INIFILE} \
        --save config/${OUTPUT}_${TIMESTAMP}.ini \
        --notes "generated_at_${TIMESTAMP}" \
-       --merge $STLS
+       --merge $STLS \
+       --output ${OUTPUT}_${TIMESTAMP}.gcode
+
 
 if [[ -n $PREVIEW ]]
 then
