@@ -3,3 +3,4 @@
 *~.skp
 *.gcode
 *.deps
+*.generated.*
