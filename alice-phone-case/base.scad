@@ -107,6 +107,11 @@ back_h = battery_h + wall_thickness;
 top_extra = 5;
 top_h = s5_h + top_extra;
 
+// The holes in the case that let the sound come out of the speaker.
+speaker_hole_r = 1;
+speaker_hole_n = 7;
+speaker_hole_spacing = 3 * speaker_hole_r;
+
 module port(w, l, h, r, x, y, z, align) {
   h = h*2;
   translate([x, y, z])
@@ -145,6 +150,18 @@ module battery() {
   }
 }
 
+module speaker_holes() {
+  translate([battery_x+battery_cutout_w/2, battery_y+battery_cutout_l/2, s5_h]) {
+    for (angle = [0:360/speaker_hole_n:359]) {
+      rotate([0,0,angle]) {
+        translate([speaker_hole_spacing,0,back_h/2]) {
+          cylinder(r=speaker_hole_r, h=back_h+10, center=true);
+        }
+      }
+    }
+  }
+}
+
 module s5_body () {
   union() {
     rounded_prism(s5_w, s5_l, s5_h, s5_r);
@@ -171,7 +188,8 @@ module s5_body () {
          s5_volume_z-button_margin, 
          s5_volume_align);
     camera_port();
-    battery();      
+    battery();
+    speaker_holes();
   }
 }
 
@@ -298,7 +316,7 @@ module button(width, length, height, radius) {
     }
     rounded_prism(width-button_spacing+button_margin*2,
                   length-button_spacing+button_margin*2,
-                  button_recess*0.5,
+                  button_recess-0.2,
                   radius);
   }
 }
@@ -425,3 +443,4 @@ translate([case_w + 2, case_l + 2, 0]) {
 
 
 // Exports: case layer2
+
