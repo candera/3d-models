@@ -42,10 +42,14 @@ module rounded_rectangle(width, height, radius) {
   }
 }
 
-// 3D rectangle with cylindrical rounded corners
-module rounded_prism(width, length, height, radius) {
-  linear_extrude(height=height) {
-    rounded_rectangle(width, length, radius);
+// 3D rectangle with cylindrical rounded corners. Scale gives an optional flare to the top.
+module rounded_prism(width, length, height, radius, scale=1) {
+  translate([width/2, length/2]) {
+    linear_extrude(height=height, scale=scale) {
+      translate([-width/2, -length/2]) {
+        rounded_rectangle(width, length, radius);
+      }
+    }
   }
 }
 

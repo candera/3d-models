@@ -12,8 +12,9 @@ s5_h = 8.5;
 s5_r = 10; // Corner radius
 
 wall_thickness = 2;
+wall_tightness = 0.2; // Makes the top wall slightly thicker to make it fit tighter
 
-bezel_projection = 2; /* This is the amount the top bezel projects over the face of the phone */
+bezel_projection = 2.5; /* This is the amount the top bezel projects over the face of the phone */
 bezel_height = 1;
 
 // Overall case width
@@ -32,12 +33,12 @@ button_margin = 1;
 button_spacing = 0.25;
 button_recess = wall_thickness*0.65;
 
-s5_charge_w = 23;
-s5_charge_h = 6;
+s5_charge_w = 25;
+s5_charge_h = 8;
 s5_charge_r = 2.5;
 s5_charge_x = s5_w/2;
 s5_charge_y = 0;
-s5_charge_z = port_z;
+s5_charge_z = port_z-1;
 s5_charge_align = 0;
 
 s5_mic_w = 3;
@@ -48,26 +49,26 @@ s5_mic_y = 0;
 s5_mic_z = port_z;
 s5_mic_align = 0;
 
-s5_power_w = 13;
-s5_power_h = 3;
+s5_power_w = 15;
+s5_power_h = 4;
 s5_power_r = 1;
 s5_power_x = 0;
 s5_power_y = 101;
-s5_power_z = port_z;
+s5_power_z = port_z-0.5;
 s5_power_align = 90;
 
-s5_volume_w = 22.4;
-s5_volume_h = 3;
+s5_volume_w = 23.4;
+s5_volume_h = 4;
 s5_volume_r = 1;
 s5_volume_x = s5_w;
-s5_volume_y = 110;
-s5_volume_z = port_z;
+s5_volume_y = 110.5;
+s5_volume_z = port_z-0.5;
 s5_volume_align = 90;
 
-s5_phones_w = 6;
+s5_phones_w = 7;
 s5_phones_h = s5_phones_w;
 s5_phones_r = s5_phones_w/2;
-s5_phones_x = 18;
+s5_phones_x = 17.5;
 s5_phones_y = s5_l;
 s5_phones_z = port_z;
 s5_phones_align = 0;
@@ -243,20 +244,12 @@ module top_bezel2() {
     /* E  */ translate([w+2*r-bw,r,0]) top_bezel_straight(l);
     translate([0, s5_l+r, 0]) {
       mirror([0,1,0]) {
-        /* NE */ translate([r,r+2*bw,0]) rotate([0,0,180]) top_bezel_curved(r);
-        /* N  */ translate([r,3*bw,0]) rotate([0,0,-90]) top_bezel_straight(w);
-        /* NW */ translate([w+r,r+2*bw,0]) rotate([0,0,-90]) top_bezel_curved(r);
+        /* NE */ translate([r,r+2*bw-wall_thickness/2,0]) rotate([0,0,180]) top_bezel_curved(r);
+        /* N  */ translate([r,3*bw-wall_thickness/2,0]) rotate([0,0,-90]) top_bezel_straight(w);
+        /* NW */ translate([w+r,r+2*bw-wall_thickness/2,0]) rotate([0,0,-90]) top_bezel_curved(r);
       }
     }
   }
-}
-
-module top_bezel() {
-  hollow_rounded_prism(width = s5_w+wall_thickness*2, 
-                       length = s5_l+wall_thickness*2, 
-                       height = wall_thickness, 
-                       breadth = wall_thickness + bezel_projection, 
-                       radius = s5_r+wall_thickness);
 }
 
 module charge_hole () {
@@ -271,7 +264,7 @@ module top_wall() {
   hollow_rounded_prism(width = case_w, 
                        length = case_l, 
                        height = top_h,
-                       breadth = wall_thickness,
+                       breadth = wall_thickness+wall_tightness,
                        radius = case_r);
 }
 
@@ -311,25 +304,13 @@ module bottom() {
 // Parameters are for the size of the port, not the button.
 module button(width, length, height, radius) {
   union() {
-    translate([button_margin, button_margin, button_recess]) {
-      rounded_prism(width-button_spacing, length-button_spacing, height, radius);
+    translate([button_margin, button_margin, button_recess-0.2]) {
+      rounded_prism(width-button_spacing, length-button_spacing, height, radius, scale=1.05);
     }
     rounded_prism(width-button_spacing+button_margin*2,
                   length-button_spacing+button_margin*2,
                   button_recess-0.2,
                   radius);
-  }
-}
-
-module case() {
-  difference() {
-    union() {
-      top();
-      translate([0,0,s5_h])
-      {
-        bottom();
-      }
-    }
   }
 }
 
@@ -362,22 +343,6 @@ module back3() { // export
   }
 }
 
-module front1() { // export
-  top();
-}
-
-module power_button() { // export
-  button(s5_power_w, s5_power_h, wall_thickness, s5_power_r); 
-}
-
-module volume_button() { // export
-  button(s5_volume_w, s5_volume_h, wall_thickness, s5_volume_r);
-}
-
-module title(s) {
-  translate([0, 0, 20]) color([0,0,0]) text(s);
-}
-
 ring_r=4;
 ring_t=1.5;
 ring_h=5;
@@ -408,85 +373,51 @@ module eyelet () { // export
         }
       }
     }
-          
-                 
-
-    /* translate([0,0,-epsilon]) */
-    /*   cylinder(r=ring_r-ring_t, h=ring_h+2*epsilon); */
-    
   }
 }
 
-
-union() {
-  back1();
-  title("back1");
-}
-translate([case_w + 2, 0, 0] ) {
-  back2();
-  title("back2");
-}
-translate([case_w * 2 + 4, 0, 0]) {
-  back3();
-  title("back3");
-}
-translate([case_w * 3 + 6, 0, 0]) {
-  front1();
-  title("front1");
-}
-translate([0, case_l + 2, 0]) {
-  power_button();
-  title("power");
-}
-translate([case_w + 2, case_l + 2, 0]) {
-  volume_button();
-  title("vol");
+module front1() { // export
+  union() {
+    top();
+    translate([case_w/2,case_l+bezel_projection+wall_thickness/2,s5_h]) {
+      rotate([0,0,180]) {
+        eyelet();
+      }
+    }
+  }
 }
 
-translate([case_w * 2 + 4, case_l + 2, 0]) {
-  eyelet();
-  title("eyelet");
+module power_button() { // export
+  button(s5_power_w, s5_power_h, wall_thickness, s5_power_r); 
 }
 
-/* /\* color([0.4, 0.4, 0.4, 1]) { *\/ */
-/* /\*   translate([wall_thickness, wall_thickness, 0]) { *\/ */
-/* /\*     s5_body();  *\/ */
-/* /\*   }  *\/ */
-/* /\* } *\/ */
+module volume_button() { // export
+  button(s5_volume_w, s5_volume_h, wall_thickness, s5_volume_r);
+}
 
-/* // case(); */
-/* // bottom(); */
-/* // pillowed_prism(100, 50, 20, 10, 5); */
+module title(s) {
+  translate([0, 0, 20]) color([0,0,0]) text(s);
+}
 
 
+module display(w, l, padding) {
+  for (n = [0:2:$children-1]) {
+    translate([(w + padding) * n/2, 0, 0]) {
+      translate([0, 15, 0]) {
+        children(n+1);
+      }
+      color([0,0,0])
+        children(n);
+    }
+  }
+}
 
-
-/* translate([case_l,0,0]) { */
-/*   rotate([0,0,90]) { */
-
-/*     difference() { */
-/*       bottom(); */
-/*       xy(above=battery_h-e2); */
-/*     } */
-
-/*     translate([case_w * 2 + 4, 0, -battery_h]) { */
-/*       difference() { */
-/*         bottom(); */
-/*         xy(below=battery_h); */
-/*       } */
-/*     } */
-
-/*     translate([case_w + 2, 0, bezel_height]) top(); */
-
-/*     translate([case_w * 1.5, case_l/2]) { */
-/*       button(s5_power_w, s5_power_h, wall_thickness, s5_power_r); */
-/*       translate([0,s5_volume_h*2,0]) { */
-/*         button(s5_volume_w, s5_volume_h, wall_thickness, s5_volume_r); */
-/*       } */
-/*     } */
-/*   } */
-/* } */
-
-
-// Exports: case layer2
+display(case_w, case_l, 2) {
+  /* text("back1"); back1(); */
+  /* text("back2"); back2(); */
+  /* text("back3"); back3(); */
+  text("front1"); front1();
+  text("power"); power_button();
+  text("vol"); volume_button();
+}
 
