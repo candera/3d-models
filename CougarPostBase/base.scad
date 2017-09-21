@@ -2,27 +2,31 @@
    https://drive.google.com/drive/u/0/folders/0B4y50yHPnOVeNzRyREZFdlA1VzQ
    */
 
-width = 40;
-height = 10.3;
-center_diameter = 10.5 * 2;
-bolt_diameter = 3;
+width = 50;
+height = 9.7;
+center_diameter = 19.0;
+bolt_diameter = 3.5;
 epsilon=0.01;
 epsilon2=2*epsilon;
+extrusion_width=0.4;
 
 alignment_post_diameter = 2.7;
 alignment_post_clearance = 0.7;
 alignment_post_length=2;
 
-gap=0.4;
+gap=1;
 
 bolt_distance=(width-center_diameter)/4;
+bolt_hole_length = 20;
 
-recess_diameter = bolt_diameter * 2;
-recess_depth = bolt_diameter;
+recess_diameter = 8.6;
+
+bolt_clearance_diameter = bolt_diameter + extrusion_width;
+recess_clearance_diameter = recess_diameter + extrusion_width;
 
 $fn=96;
 
-module unit_half() {
+module unit_half(sides) {
   union() {
     difference () {
       // Outer shell
@@ -34,25 +38,29 @@ module unit_half() {
       // Bolt hole 1
       translate ([-epsilon,bolt_distance-width/2,height/2]) {
         rotate([0,90,0]) {
-          cylinder(d=bolt_diameter, h=width/2+epsilon2);
+          cylinder(d=bolt_clearance_diameter, h=width/2+epsilon2);
         }
       }
       // Bolt hole 2
       translate ([-epsilon,width/2-bolt_distance,height/2]) {
         rotate([0,90,0]) {
-          cylinder(d=bolt_diameter, h=width/2+epsilon2);
+          cylinder(d=bolt_clearance_diameter, h=width/2+epsilon2);
         }
       }
       // Recess hole 1
-      translate([sin(90*((width - center_diameter)/width))*width/2-recess_diameter,bolt_distance-width/2,height/2]) {
+      translate([bolt_hole_length/2,
+                 bolt_distance-width/2,
+                 height/2]) {
         rotate([0,90,0]) {
-          cylinder(d=recess_diameter, h=recess_depth*10);
+          cylinder(d=recess_clearance_diameter, h=width, $fn=sides);
         }
       }
-      // Recess hole 1
-      translate([sin(90*((width - center_diameter)/width))*width/2-recess_diameter,-(bolt_distance-width/2),height/2]) {
+      // Recess hole 2
+      translate([bolt_hole_length/2,
+                 -(bolt_distance-width/2),
+                 height/2]) {
         rotate([0,90,0]) {
-          cylinder(d=recess_diameter, h=recess_depth*10);
+          cylinder(d=recess_clearance_diameter, h=width, $fn=sides);
         }
       }
       // Alignment hole
@@ -75,21 +83,17 @@ module unit_half() {
   }
 }
 
-module unit() {
-  union() {
-    unit_half();
-    translate([0,0,height]) {
-      mirror([0,0,1]) {
-        unit_half();
-      }
-    }
-  }
+module round_unit_half() { // export
+  unit_half(sides=96);
+}
+
+module hex_unit_half() { // export
+  unit_half(sides=6);
 }
 
 color([0.2,0.2,0.2]) {
-  union() {
-    unit_half();
-    /* unit(); */
-    /* mirror([1,0,0]) unit(); */
+  round_unit_half();
+  translate([width/2 + 2,0,0]) {
+    hex_unit_half();
   }
 }
