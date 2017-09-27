@@ -6,13 +6,12 @@
 #  body_of_module();
 # }
 #
-# You will now be able to run `make foobar.stl` and it'll do the right
+# You will now be able to run `make foobar.generated.stl` and it'll do the right
 # thing as far as figuring out dependencies and not rebuilding too
 # often. It does this by generating foobar.scad and foobar.deps, which
 # you probably don't want to check in.
 
 # match "module foobar() { // export
-#TARGETS=$(shell sed '/^module [a-z0-9_-]*().*make..\?me.*$$/!d;s/module //;s/().*/.stl/' base.scad)
 TARGETS=$(shell sed '/^module [a-z0-9_-].*().*export/!d;s/module //;s/().*/.generated.stl/' base.scad)
 
 .PHONY: clean
