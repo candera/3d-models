@@ -14,7 +14,7 @@ s5_r = 10; // Corner radius
 wall_thickness = 2;
 wall_tightness = 0.2; // Makes the top wall slightly thicker to make it fit tighter
 
-bezel_projection = 2.5; /* This is the amount the top bezel projects over the face of the phone */
+bezel_projection = 3.5; /* This is the amount the top bezel projects over the face of the phone */
 bezel_height = 1;
 
 // Overall case width
@@ -68,7 +68,7 @@ s5_volume_align = 90;
 s5_phones_w = 7;
 s5_phones_h = s5_phones_w;
 s5_phones_r = s5_phones_w/2;
-s5_phones_x = 17.5;
+s5_phones_x = 18.5;
 s5_phones_y = s5_l;
 s5_phones_z = port_z;
 s5_phones_align = 0;
@@ -242,11 +242,11 @@ module top_bezel2() {
     /* S  */ translate([r,bw,0]) rotate([0,0,-90]) top_bezel_straight(w);
     /* SE */ translate([w+r,r,0]) rotate([0,0,-90]) top_bezel_curved(r);
     /* E  */ translate([w+2*r-bw,r,0]) top_bezel_straight(l);
-    translate([0, s5_l+r, 0]) {
+    translate([0, 0, 0]) {
       mirror([0,1,0]) {
-        /* NE */ translate([r,r+2*bw-wall_thickness/2,0]) rotate([0,0,180]) top_bezel_curved(r);
-        /* N  */ translate([r,3*bw-wall_thickness/2,0]) rotate([0,0,-90]) top_bezel_straight(w);
-        /* NW */ translate([w+r,r+2*bw-wall_thickness/2,0]) rotate([0,0,-90]) top_bezel_curved(r);
+        /* NE */ translate([r,-s5_l+s5_r-wall_thickness,0]) rotate([0,0,180]) top_bezel_curved(r);
+        /* N  */ translate([r,-s5_l+bezel_projection-wall_thickness,0]) rotate([0,0,-90]) top_bezel_straight(w);
+        /* NW */ translate([w+r,-s5_l+s5_r-wall_thickness,0]) rotate([0,0,-90]) top_bezel_curved(r);
       }
     }
   }
@@ -288,7 +288,7 @@ module bottom() {
                    height=back_h*2,
                    h_radius=case_r,
                    v_radius=case_vertical_r);
-    translate([-e,-e,-e]) {
+    translate([-e,-e,-e2]) {
       hollow_rounded_prism(width=case_w+e2,
                            length=case_l+e2,
                            height=top_extra+e,
@@ -304,7 +304,7 @@ module bottom() {
 // Parameters are for the size of the port, not the button.
 module button(width, length, height, radius) {
   union() {
-    translate([button_margin, button_margin, button_recess-0.2]) {
+    translate([button_margin, button_margin, button_recess-0.2-e]) {
       rounded_prism(width-button_spacing, length-button_spacing, height, radius, scale=1.05);
     }
     rounded_prism(width-button_spacing+button_margin*2,
@@ -345,11 +345,11 @@ module back3() { // export
 
 ring_r=4;
 ring_t=1.5;
-ring_h=5;
+ring_h=4.5;
 
 module eyelet () { // export
   difference() {
-    scale([3,1,1]) {
+    scale([1.8,1,1]) {
       union() {
         cylinder(r=ring_r, h=ring_h);
         translate([-ring_r,0,0]) {
@@ -358,15 +358,16 @@ module eyelet () { // export
       }
     }
     translate([0,0,-epsilon]) {
+      hole_width=ring_r*1.8;
       scale([1,1,1+epsilon]) {
         union() {
           translate([-ring_r,-ring_r/2,0]) {
-            cube([ring_r*2, ring_r, ring_h]);
+            cube([hole_width, ring_r, ring_h]);
           }
-          translate([-ring_r,0,0]) {
+          translate([-hole_width/2,0,0]) {
             cylinder(r=ring_r/2, h=ring_h+2*epsilon);
           }
-          translate([ring_r,0,0]) {
+          translate([hole_width/2,0,0]) {
             cylinder(r=ring_r/2, h=ring_h+2*epsilon);
           }
 
@@ -379,8 +380,8 @@ module eyelet () { // export
 module front1() { // export
   union() {
     top();
-    translate([case_w/2,case_l+bezel_projection+wall_thickness/2,s5_h]) {
-      rotate([0,0,180]) {
+    translate([case_w/4,-ring_r,s5_h+5-ring_h]) {
+      rotate([0,0,0]) {
         eyelet();
       }
     }
@@ -395,29 +396,34 @@ module volume_button() { // export
   button(s5_volume_w, s5_volume_h, wall_thickness, s5_volume_r);
 }
 
+module button_mold() { // export
+  translate([0,0,wall_thickness]) {
+    mirror([0,0,1]) {
+      difference() {
+        cube([s5_power_w * 2, (s5_power_h + s5_volume_h + wall_thickness) * 2, wall_thickness]);
+        translate([wall_thickness,wall_thickness,-e]) {
+          power_button();
+          translate([0, s5_volume_h + s5_power_h, 0]) {
+            volume_button();
+          }
+        }
+      }
+    }
+  }
+}
+
 module title(s) {
   translate([0, 0, 20]) color([0,0,0]) text(s);
 }
 
-
-module display(w, l, padding) {
-  for (n = [0:2:$children-1]) {
-    translate([(w + padding) * n/2, 0, 0]) {
-      translate([0, 15, 0]) {
-        children(n+1);
-      }
-      color([0,0,0])
-        children(n);
-    }
-  }
-}
 
 display(case_w, case_l, 2) {
   /* text("back1"); back1(); */
   /* text("back2"); back2(); */
   /* text("back3"); back3(); */
   text("front1"); front1();
-  text("power"); power_button();
-  text("vol"); volume_button();
+  /* text("power"); power_button(); */
+  /* text("vol"); volume_button(); */
+  /* text("button mold"); button_mold(); */
 }
 
