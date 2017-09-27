@@ -88,3 +88,32 @@ module xy(above, below)
   else
     translate([0,0,below-d/2]) cube([d,d,d], center=true);
 }
+
+// Lays things out in a line with labels
+// TODO: Lay them out in a grid instead
+module display(w, l=10, padding=2) {
+  for (n = [0:2:$children-1]) {
+    translate([(w + padding) * n/2, 0, 0]) {
+      translate([0, l, 0]) {
+        children(n+1);
+      }
+      color([0,0,0])
+        children(n);
+    }
+  }
+}
+
+module quarter_cylinder(r, h) {
+  difference() {
+    translate([0,0,h/2]) {
+      cylinder(r=r, h=h, center=true);
+    }
+    translate([-r*2-epsilon,-r*2,-epsilon]) {
+      cube([r*2,r*4,h*2]);
+    }
+    translate([-r*2-epsilon,-r*2,-epsilon]) {
+      cube([r*4,r*2,h*2]);
+    }
+
+  }
+}
