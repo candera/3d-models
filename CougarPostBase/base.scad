@@ -4,12 +4,17 @@
 use <../lib/common.scad>;
 
 width = 50;
-height = 9.7;
+height = 9.7; // Height at center
+cougar_base_d = 39.5; 
+rim_gap = 0.635; // Gap at the edge of the cougar post
+rim_height = height + (width * rim_gap / cougar_base_d);
+wedge_angle = atan2(rim_height-height, width/2);
 center_diameter = 19.5;
 bolt_diameter = 3.5;
 epsilon=0.01;
 epsilon2=2*epsilon;
 extrusion_width=0.4;
+
 
 alignment_post_diameter = 2.7;
 alignment_post_clearance = 0.7;
@@ -28,11 +33,17 @@ recess_clearance_diameter = recess_diameter + 2 * extrusion_width;
 $fn=96;
 
 module unit(sides, half=false) {
-  h = height / (half ? 2 : 1);
+  h = rim_height / (half ? 2 : 1);
   union() {
     difference () {
       // Outer shell
       cylinder(d=width, h=h);
+      // Slope down to center
+      translate([0,-width/2,height]) {
+        rotate([0,-wedge_angle,0]) {
+          cube([width/2, width, rim_height - height]);
+        }
+      }
       // Inner hole
       translate([0,0,-epsilon]) {
         cylinder(d=center_diameter, h=h+epsilon2);
@@ -107,8 +118,8 @@ module hex() { // export
 
 color([0.2,0.2,0.2]) {
   display(width*1.2, width, 2) {
-    text("1/2 round"); round_half();
-    text("1/2 hex");   hex_half();
+    /* text("1/2 round"); round_half(); */
+    /* text("1/2 hex");   hex_half(); */
     text("round"); round();
     text("hex"); hex();
   }
