@@ -4,7 +4,7 @@
 use <../lib/common.scad>;
 
 width = 50;
-height = 9.7; // Height at center
+height = 9.7 + 0.65 - 0.1; // Height at center
 cougar_base_d = 39.5; 
 rim_gap = 0.635; // Gap at the edge of the cougar post
 rim_height = height + (width * rim_gap / cougar_base_d);
@@ -27,7 +27,7 @@ bolt_hole_length = 20;
 
 recess_diameter = 8.7;
 
-bolt_clearance_diameter = bolt_diameter + extrusion_width;
+bolt_clearance_diameter = bolt_diameter + (extrusion_width * 2);
 recess_clearance_diameter = recess_diameter + 2 * extrusion_width;
 
 $fn=96;
@@ -116,11 +116,29 @@ module hex() { // export
   unit(sides=6, half=false);
 }
 
+module round_flipped () { // export
+  translate([0,0,height]) {
+    rotate([180,-wedge_angle,0]) {
+      round();
+    }
+  }
+}
+
+module hex_flipped () { // export
+  translate([0,0,height]) {
+    rotate([180,-wedge_angle,0]) {
+      hex();
+    }
+  }
+}
+
 color([0.2,0.2,0.2]) {
   display(width*1.2, width, 2) {
     /* text("1/2 round"); round_half(); */
     /* text("1/2 hex");   hex_half(); */
     text("round"); round();
     text("hex"); hex();
+    text("r flip"); round_flipped();
+    text("h flip"); hex_flipped();
   }
 }
