@@ -1,0 +1,13 @@
+* Description
+
+A "cervical collar" type brace for the base of a Thrustmaster Warthog
+or Cougar. They tend to snap there.
+
+Designed to be clamped together with two #6 32 x 1 inch machine screws
+and bolts, easily available at home centers.
+
+* Print Notes
+
+Printed on glass with purple glue stick. Bare glass did not work at
+all. Material is eSun's excellent carbon fiber-infused polycarbonate.
+See [[print-settings-xxx.3mf][Cura settings file]] for details.
