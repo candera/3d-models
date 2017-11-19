@@ -1,0 +1,9 @@
+* Description
+
+A reducing coupler for a vacuum system. Parameterizable to have either
+male or female end (positive or negative taper).
+
+* Print Notes
+** [2017-11-19 Sun]
+Printed on glass with purple glue stick in black ABS plastic. Good
+results after zeroing the initial z height a bazillion times.
