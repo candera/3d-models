@@ -11,3 +11,7 @@ and bolts, easily available at home centers.
 Printed on glass with purple glue stick. Bare glass did not work at
 all. Material is eSun's excellent carbon fiber-infused polycarbonate.
 See [[print-settings-xxx.3mf][Cura settings file]] for details.
+
+** [2017-11-17 Fri]
+
+Z hop setting was not enough - still getting tracks on the top.
