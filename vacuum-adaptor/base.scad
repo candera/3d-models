@@ -145,7 +145,7 @@ module reducer (
 }
 
 /* This is the piece that has the hose that goes from the waste to the
- * bucket. */
+ * bucket (input side). */
 module inlet() { // export
   reducer(
     wide_height=38,
@@ -156,14 +156,15 @@ module inlet() { // export
     );
 }
 
-/* This is the piece that goes from the bucket to suction */
+/* This is the piece that goes from the bucket to suction (vacuum side) */
 module outlet () { // export
   reducer(
     wide_height=38,
     wide_inner_d=inches(2.5),
     narrow_height=57,
-    narrow_inner_d=33.2,
-    narrow_taper=-taper
+    narrow_inner_d=34.2,
+    narrow_taper=-taper,
+    parts=REDUCER_NARROW_PART
     );
 }
 
