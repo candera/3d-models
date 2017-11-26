@@ -4,7 +4,7 @@ $fn=96;
 e=0.01;
 
 // Defaults
-wall_thickness=3.5;
+wall_thickness=3.85;
 taper=1/57;
 gap=0.35;
 
@@ -71,6 +71,8 @@ module join_plate (
 
 REDUCER_WIDE_PART=1;
 REDUCER_NARROW_PART=2;
+REDUCER_NARROW_PROFILE_ROUND=1;
+REDUCER_NARROW_PROFILE_SQUARE=2;
 
 /* A reducer coupling, in two parts */
 module reducer (
@@ -84,9 +86,8 @@ module reducer (
   narrow_inner_d,
   narrow_taper=taper,
   wall_thickness=wall_thickness,
-  parts=REDUCER_NARROW_PART+REDUCER_WIDE_PART /* wide only = 1,
-                                               * narrow only = 2,
-                                               * both = 3 */
+  parts=REDUCER_NARROW_PART + REDUCER_WIDE_PART,
+  narrow_profile=REDUCER_NARROW_PROFILE_ROUND
   )
 {
   wide_outer_d = wide_outer_d == undef ? wide_inner_d + wall_thickness * 2 : wide_outer_d;
@@ -121,21 +122,37 @@ module reducer (
     // Narrow part and plate
     if (bit_test(parts, 1) == 1) {
       translate([wide_outer_d/2+1,0,0]) {
-        union() {
-          base_outer_d=narrow_outer_d + (narrow_taper * narrow_height);
-          // Nozzle
-          tapered_hollow_cylinder(
-            height=narrow_height,
-            base_outer_d=base_outer_d,
-            taper=narrow_taper,
-            wall_thickness=wall_thickness);
-          // Join plate
-          difference() {
-            cylinder(h=wall_thickness, 
-                     d=rabbet_d - (gap * 2));
-            translate([0,0,-e]) {
-              cylinder(h=wall_thickness+2*e, 
-                       d=base_outer_d-(wall_thickness/2));
+        difference() {
+          union() {
+            base_outer_d=narrow_outer_d + (narrow_taper * narrow_height);
+            // Nozzle
+            if (narrow_profile == REDUCER_NARROW_PROFILE_ROUND) {
+              tapered_hollow_cylinder(
+                height=narrow_height,
+                base_outer_d=base_outer_d,
+                taper=narrow_taper,
+                wall_thickness=wall_thickness);
+            }
+            else {
+              translate([0,0,narrow_height/2]) {
+                difference() {
+                  cube([rabbet_d - wall_thickness*4, narrow_outer_d, narrow_height], center=true);
+                }
+              }
+            }
+            // Join plate
+            difference() {
+              cylinder(h=wall_thickness, 
+                       d=rabbet_d - (gap * 2));
+              translate([0,0,-e]) {
+                cylinder(h=wall_thickness+2*e, 
+                         d=base_outer_d-(wall_thickness/2));
+              }
+            }
+          }
+          if (narrow_profile == REDUCER_NARROW_PROFILE_SQUARE) {
+            translate([0,0,narrow_height/2]) {
+              cube([rabbet_d - wall_thickness*6, narrow_outer_d-wall_thickness*2, narrow_height+2*e], center=true);
             }
           }
         }
@@ -152,7 +169,7 @@ module inlet() { // export
     wide_inner_d=inches(2.5),
     narrow_height=57,
     narrow_outer_d=37.4,
-    parts=REDUCER_NARROW_PART
+    parts=REDUCER_NARROW_PART+REDUCER_WIDE_PART
     );
 }
 
@@ -162,15 +179,29 @@ module outlet () { // export
     wide_height=38,
     wide_inner_d=inches(2.5),
     narrow_height=57,
-    narrow_inner_d=34.2,
+    narrow_inner_d=34.7,
     narrow_taper=-taper,
-    parts=REDUCER_NARROW_PART
+    parts=REDUCER_NARROW_PART+REDUCER_WIDE_PART
+    );
+}
+
+/* This is an adapter from my shop vacuum to a narrow nozzle for
+ * evacuating plastic bags. */
+module bag_pump() { // export
+  reducer(
+    wide_height=38,
+    wide_inner_d=31.75,
+    narrow_height=57,
+    narrow_inner_d=5,
+    wall_thickness = 0.35 * 6,
+    parts=REDUCER_NARROW_PART + REDUCER_WIDE_PART,
+    narrow_profile=REDUCER_NARROW_PROFILE_SQUARE    
     );
 }
 
 display(inches(6)) {
   text("inlet"); translate([0,inches(1.25),0]) inlet();
   text("outlet"); translate([0,inches(1.25),0]) outlet();
-    
+  text("bag"); translate([0,inches(1.25),0]) bag_pump();
 }
 
