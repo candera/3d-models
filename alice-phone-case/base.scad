@@ -38,7 +38,7 @@ s5_charge_h = 8;
 s5_charge_r = 2.5;
 s5_charge_x = s5_w/2;
 s5_charge_y = 0;
-s5_charge_z = port_z-1;
+s5_charge_z = port_z;
 s5_charge_align = 0;
 
 s5_mic_w = 3;
