@@ -1,0 +1,26 @@
+* Description
+
+A custom phone case for my wife, who has a huge extension battery on
+her Galaxy S5, and therefore can't use any of the standard cases. The
+eyelet is for a lanyard, which helps her keep from dropping it.
+
+Case has so far performed extremely well. We've had to print a few
+extras due to splitting along layer lines, but she loves it and the
+phone screen has survived all the drops so far.
+
+* Print Notes
+
+White ABS printed on glass with purple glue stick.
+
+** [2017-12-30 Sat] [0/4]
+
+- [ ] Increased fill to 100%. Probably should have printed with a
+  skirt - something to change next time.
+- [ ] Something else: when printed without a raft, the face develops a
+  lip at the first layer. This makes assembling the case harder: a
+  beveled edge would help.
+- [ ] There should also be a notch somewhere to help with pulling the
+  two halves apart.
+- [ ] Alice also wants me to make the earphone port bigger - she says
+  there's something she can't plug into it, although I need her to
+  verify that.
