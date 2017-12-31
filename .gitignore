@@ -2,6 +2,7 @@
 *.factory
 *~.skp
 *.gcode
+!*.settings.gcode
 *.deps
 *.generated.*
 *#
