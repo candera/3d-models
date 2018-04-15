@@ -119,3 +119,6 @@ module quarter_cylinder(r, h) {
 }
 
 function bit_test(val, bit) = floor(val / (pow(2,bit))) % 2;
+
+function inches(in) = in * 25.4;
+

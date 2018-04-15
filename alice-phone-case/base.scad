@@ -2,6 +2,9 @@ include <../lib/common.scad>;
 
 $fn = 96;
 
+extrusion_width = 0.35;
+filiament_diameter = 1.75;
+
 e = epsilon;
 e2 = 2 * epsilon;
 
@@ -112,6 +115,11 @@ top_h = s5_h + top_extra;
 speaker_hole_r = 1;
 speaker_hole_n = 7;
 speaker_hole_spacing = 3 * speaker_hole_r;
+
+// The notches in the case that let the two sides lock together
+lock_notch_r=1;
+lock_notch_l=10;
+lock_notch_count=3;
 
 module port(w, l, h, r, x, y, z, align) {
   h = h*2;
@@ -269,12 +277,27 @@ module top_wall() {
 }
 
 module top() {
+  union() {
+    // Lock bumps to keep the thing from opening at the middle
+    for (x_pos = [0, case_w-wall_thickness*2]) {
+      for (y_pos = [1:lock_notch_count]) {
+        translate([x_pos+lock_notch_r*2, case_l*y_pos/(lock_notch_count+1), top_h-lock_notch_r]) {
+          rotate([-90, 0, 0]) {
+            cylinder(r=lock_notch_r-extrusion_width/2, h=lock_notch_l-extrusion_width/2);
+          }
+        }
+      }
+    }
+    // Main body
   difference() {
     union () {
       mirror([0,0,1]) top_bezel2();
       top_wall();
     }
     translate([wall_thickness, wall_thickness, -e]) s5_body();
+      // Notch to allow opening it
+      translate([-5, case_l*0.6, s5_h+4]) cube([10, 20, 5]);
+    }
   }
 }
 
@@ -282,6 +305,7 @@ module top() {
 // plane lying face down on x-y axis, so back is in positive z
 // direction.
 module bottom() {
+  union() {
   difference() {
     pillowed_prism(width=case_w,
                    length=case_l,
@@ -297,6 +321,36 @@ module bottom() {
     }
     translate([0,0,-5000]) cube([10000,10000,10000], center=true);
     translate([wall_thickness, wall_thickness, -s5_h-e]) s5_body();
+      // Lock bumps to keep the thing from opening at the middle
+      for (x_pos = [0, case_w-wall_thickness*2]) {
+        for (y_pos = [1:(lock_notch_count)]) {
+          translate([x_pos+lock_notch_r*2, case_l*y_pos/(lock_notch_count + 1), top_extra-lock_notch_r]) {
+            rotate([-90, 0, 0]) {
+              cylinder(r=lock_notch_r, h=lock_notch_l);
+            }
+          }
+        }
+      }
+      // Alignment holes
+      translate([0, 0, -50]) {
+        translate([15, 0, 0]) {
+          translate([0, 15, 0]) {
+            cylinder(d = filiament_diameter + 2 * extrusion_width, h = 100);
+          }
+          translate([0, case_l - 15, 0]) {
+            cylinder(d = filiament_diameter + 2 * extrusion_width, h = 100);
+          }
+        }
+        translate([case_w-15, 0, 0]) {
+          translate([0, 15, 0]) {
+            cylinder(d = filiament_diameter + 2 * extrusion_width, h = 100);
+          }
+          translate([0, case_l - 15, 0]) {
+            cylinder(d = filiament_diameter + 2 * extrusion_width, h = 100);
+          }
+        }
+      }
+    }
   }
 }
 
@@ -347,7 +401,7 @@ ring_r=4;
 ring_t=1.5;
 ring_h=4.5;
 
-module eyelet () { // export
+module eyelet() { // export
   difference() {
     scale([1.8,1,1]) {
       union() {
@@ -418,9 +472,9 @@ module title(s) {
 
 
 display(case_w, case_l, 2) {
-  /* text("back1"); back1(); */
-  /* text("back2"); back2(); */
-  /* text("back3"); back3(); */
+  text("back1"); back1();
+  text("back2"); back2();
+  text("back3"); back3();
   text("front1"); front1();
   /* text("power"); power_button(); */
   /* text("vol"); volume_button(); */
