@@ -14,11 +14,13 @@ s5_w = 73;
 s5_h = 8.5;
 s5_r = 10; // Corner radius
 
-wall_thickness = 2;
-wall_tightness = 0.2; // Makes the top wall slightly thicker to make it fit tighter
+wall_thickness = 2.4;
+// Makes the front wall slightly thicker to make it fit tighter
+// wall_tightness = 0.2;
+wall_tightness = 0.0;
 
-bezel_projection = 3.5; /* This is the amount the top bezel projects over the face of the phone */
-bezel_height = 1;
+bezel_projection = 3.5; /* This is the amount the front bezel projects over the face of the phone */
+bezel_height = 1.5; /* This is how far it projects from the face of the phone */
 
 // Overall case width
 case_l = s5_l + wall_thickness*2;
@@ -76,7 +78,7 @@ s5_phones_y = s5_l;
 s5_phones_z = port_z;
 s5_phones_align = 0;
 
-// Not totally sure what this one is. On the top edge, looks like IR and baro?
+// Not totally sure what this one is. On the front edge, looks like IR and baro?
 s5_other_w = 8;
 s5_other_h = 3;
 s5_other_r = 1.5;
@@ -86,13 +88,14 @@ s5_other_z = port_z;
 s5_other_align = 0;
 
 // Alice's giant battery
+battery_padding=0.2;
 battery_h = 11.5; // How much it projects behind the phone
 battery_w = 61;
 battery_l = 85;
 battery_cutout_w = 16;
 battery_cutout_l = 11;
-battery_x = 5.2;
-battery_y = 17.2;
+battery_x = 5.2 - (battery_padding / 2);
+battery_y = 17.2 - (battery_padding / 2);
 
 // There are two openings at/near the camera. Not sure what the lower
 // one is for. Flash?
@@ -152,9 +155,9 @@ module battery() {
   translate([battery_x, battery_y, s5_h]) {
     difference() {
       cube([battery_w, battery_l, battery_h]);
-      translate([-e,-e,-e]) {
-        cube([battery_cutout_w+e2, battery_cutout_l+e2, battery_h+e2]);
-      }
+      /* translate([-e,-e,-e]) { */
+      /*   cube([battery_cutout_w+e2, battery_cutout_l+e2, battery_h+e2]); */
+      /* } */
     }
   }
 }
@@ -279,9 +282,9 @@ module top_wall() {
 module top() {
   union() {
     // Lock bumps to keep the thing from opening at the middle
-    for (x_pos = [0, case_w-wall_thickness*2]) {
+    for (x_pos = [wall_thickness, case_w-wall_thickness]) {
       for (y_pos = [1:lock_notch_count]) {
-        translate([x_pos+lock_notch_r*2, case_l*y_pos/(lock_notch_count+1), top_h-lock_notch_r]) {
+        translate([x_pos, case_l*y_pos/(lock_notch_count+1), top_h-lock_notch_r]) {
           rotate([-90, 0, 0]) {
             cylinder(r=lock_notch_r-extrusion_width/2, h=lock_notch_l-extrusion_width/2);
           }
@@ -289,12 +292,12 @@ module top() {
       }
     }
     // Main body
-  difference() {
-    union () {
-      mirror([0,0,1]) top_bezel2();
-      top_wall();
-    }
-    translate([wall_thickness, wall_thickness, -e]) s5_body();
+    difference() {
+      union () {
+        mirror([0,0,1]) top_bezel2();
+        top_wall();
+      }
+      translate([wall_thickness, wall_thickness, -e]) s5_body();
       // Notch to allow opening it
       translate([-5, case_l*0.6, s5_h+4]) cube([10, 20, 5]);
     }
@@ -306,21 +309,21 @@ module top() {
 // direction.
 module bottom() {
   union() {
-  difference() {
-    pillowed_prism(width=case_w,
-                   length=case_l,
-                   height=back_h*2,
-                   h_radius=case_r,
-                   v_radius=case_vertical_r);
-    translate([-e,-e,-e2]) {
-      hollow_rounded_prism(width=case_w+e2,
-                           length=case_l+e2,
-                           height=top_extra+e,
-                           breadth=wall_thickness+e,
-                           radius=case_r);
-    }
-    translate([0,0,-5000]) cube([10000,10000,10000], center=true);
-    translate([wall_thickness, wall_thickness, -s5_h-e]) s5_body();
+    difference() {
+      pillowed_prism(width=case_w,
+                     length=case_l,
+                     height=back_h*2,
+                     h_radius=case_r,
+                     v_radius=case_vertical_r);
+      translate([-e,-e,-e2]) {
+        hollow_rounded_prism(width=case_w+e2,
+                             length=case_l+e2,
+                             height=top_extra+e,
+                             breadth=wall_thickness+e,
+                             radius=case_r);
+      }
+      translate([0,0,-5000]) cube([10000,10000,10000], center=true);
+      translate([wall_thickness, wall_thickness, -s5_h-e]) s5_body();
       // Lock bumps to keep the thing from opening at the middle
       for (x_pos = [0, case_w-wall_thickness*2]) {
         for (y_pos = [1:(lock_notch_count)]) {
@@ -332,21 +335,22 @@ module bottom() {
         }
       }
       // Alignment holes
+      hole_d = filiament_diameter + 2 * extrusion_width + 0.1;
       translate([0, 0, -50]) {
         translate([15, 0, 0]) {
           translate([0, 15, 0]) {
-            cylinder(d = filiament_diameter + 2 * extrusion_width, h = 100);
+            cylinder(d = hole_d, h = 100);
           }
           translate([0, case_l - 15, 0]) {
-            cylinder(d = filiament_diameter + 2 * extrusion_width, h = 100);
+            cylinder(d = hole_d, h = 100);
           }
         }
         translate([case_w-15, 0, 0]) {
           translate([0, 15, 0]) {
-            cylinder(d = filiament_diameter + 2 * extrusion_width, h = 100);
+            cylinder(d = hole_d, h = 100);
           }
           translate([0, case_l - 15, 0]) {
-            cylinder(d = filiament_diameter + 2 * extrusion_width, h = 100);
+            cylinder(d = hole_d, h = 100);
           }
         }
       }
@@ -472,9 +476,10 @@ module title(s) {
 
 
 display(case_w, case_l, 2) {
-  text("back1"); back1();
-  text("back2"); back2();
-  text("back3"); back3();
+  text("back"); bottom();
+  /* text("back1"); back1(); */
+  /* text("back2"); back2(); */
+  /* text("back3"); back3(); */
   text("front1"); front1();
   /* text("power"); power_button(); */
   /* text("vol"); volume_button(); */
