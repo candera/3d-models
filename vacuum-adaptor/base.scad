@@ -8,8 +8,6 @@ wall_thickness=3.85;
 taper=1/57;
 gap=0.35;
 
-function inches(in) = in * 25.4;
-
 module tapered_hollow_cylinder(
   height,                       /* height */
   base_outer_d,                 /* outer diameter at the bottom */
