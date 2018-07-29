@@ -1,3 +1,5 @@
+include <../lib/common.scad>;
+
 overall_length = 240;
 overall_width = 26;
 overall_height = 60;
@@ -39,10 +41,14 @@ module wedge_position() {
     }
 }
 
-module plane_body() {
+module plane_body( 
+  slot_width = inches(0.75) + 0.35,
+  slot_depth = 5,
+  slot_offset = 6,
+  mouth_width = iron_thickness * 0.2) {
   difference() {
     // Plane body
-    cube([overall_width,overall_length,overall_height]);
+    cube([overall_width-2*epsilon,overall_length,overall_height]);
     // Ejection hole
     translate([0, cos(iron_bed_angle+90)*ejection_hole_diameter/2.5, sin(iron_bed_angle+90)*ejection_hole_diameter/2.5]) {
       translate([0, cos(iron_bed_angle)*through_slot_length/2, sin(iron_bed_angle)*through_slot_length/2]) {
@@ -55,13 +61,16 @@ module plane_body() {
     }
     // Iron bed slot
     translate([-epsilon,iron_position,-epsilon]) {
-      rotate([90,0,0]) {
-        rotate([0,90,0]) {
-          linear_extrude(height=overall_width+2*epsilon) {
-            wedge_poly(ejection_mouth_width,iron_bed_angle,iron_bed_angle+iron_clearance_angle,through_slot_length);
-          }
-        }
+      rotate([-iron_bed_angle, 0, 0]) {
+        cube([overall_width,iron_thickness+mouth_width,iron_wide_length+iron_thickness*sin(iron_bed_angle)+2]);
       }
+      /* rotate([90,0,0]) { */
+      /*   rotate([0,90,0]) { */
+      /*     linear_extrude(height=overall_width+2*epsilon) { */
+      /*       wedge_poly(ejection_mouth_width,iron_bed_angle,iron_bed_angle+iron_clearance_angle,through_slot_length); */
+      /*     } */
+      /*   } */
+      /* } */
     }
     // Wedge hole
     wedge_position() {
@@ -69,10 +78,30 @@ module plane_body() {
         wedge_poly(wedge_opening, iron_bed_angle, iron_bed_angle+wedge_angle, wedge_length);
       }
     }
+    // Reinforcement slot 1
+    translate([-epsilon, -epsilon, overall_height - slot_width - slot_offset]) {
+      cube([slot_depth+epsilon, overall_length+2*epsilon, slot_width]);
+    }
+    // Reinforcement slot 2
+    translate([overall_width-slot_depth, -epsilon, overall_height - slot_width - slot_offset]) {
+      cube([slot_depth+epsilon, overall_length+2*epsilon, slot_width]);
+    }
+    /* // Alignment hole 1 */
+    /* translate([-epsilon, overall_length/4, overall_height/2]) { */
+    /*   rotate([0,90,0]) { */
+    /*     cylinder(d=1.75+0.35, h=100); */
+    /*   } */
+    /* } */
   }
 }
 
-module wedge() {
+/* I have to to this because I haven't figured out how to make the
+ * export comment work when there are parameters. */
+module plane_body2() { // export
+  plane_body();
+}
+
+module wedge() { // export
   union() {
     translate([wedge_length*cos(iron_bed_angle+wedge_angle/2),wedge_length*sin(iron_bed_angle+wedge_angle/2)]) {
       // TODO: Make diameter parametric
@@ -91,7 +120,29 @@ module both() {
   }
 }
 
-rotate([0,-90,0]) plane_body();
-//translate([25,0,0]) rotate([0,0,iron_bed_angle]) wedge();
+module body_right() {
+  difference() {
+    translate([0,0,overall_width/2]) {
+      rotate([0,90,0]) {
+        plane_body();
+      }
+    }
+    xy(below=0);
+  }
+}
 
+module body_left() {
+  difference() {
+    translate([overall_height,0,-overall_width/2]) {
+      rotate([0,-90,0]) {
+        plane_body();
+      }
+    }
+    xy(below=0);
+  }
+}
 
+display(overall_height * 1.3, 10, 2) {
+  text("body"); plane_body();
+  text("wedge"); wedge();
+}
