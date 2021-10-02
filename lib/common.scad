@@ -122,3 +122,7 @@ function bit_test(val, bit) = floor(val / (pow(2,bit))) % 2;
 
 function inches(in) = in * 25.4;
 
+// Concatenate two vectors. TODO: Make it work with N vectors. Here's
+// what it looks like with three:
+// function cat(L1, L2, L3) = [for(L=[L1, L2, L3], a=L) a];
+function cat(L1, L2) = [for(L=[L1, L2], a=L) a];
